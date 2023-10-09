@@ -2,6 +2,14 @@
 #include <chrono>
 using namespace std;
 
+int small_primes[] = {
+	2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53,
+	59, 61, 67, 71, 73, 79,	83,	89,	97, 101, 103, 107, 109,	113,
+	127, 131, 137, 139,	149, 151, 157, 163,	167, 173, 179, 181,
+	191, 193, 197, 199,	211, 223, 227, 229, 233, 239, 241, 251
+};
+const int small_primes_count = sizeof(small_primes) / sizeof(small_primes[0]);
+
 int fast_pow_mod(int num, int pow, int mod) {
 	int steps = floor(log2(pow));
 	_int64 res = num;
@@ -29,14 +37,15 @@ bigint fast_pow_mod(bigint num, bigint pow, bigint mod)
 	bigint result = 1;
 	for (unsigned long long i = 0; i <= steps; i++) {
 		TRACE2(cout << "Bit: " << (pow[0] & 1) << endl);
-		if (pow % 2 == 1) {
+		if (pow[0] & 1) {
 			TRACE2(cout << "Result: ");
 			TRACE2(cout << result << " * " << res << ") % " << mod << " = ");
 			result = (result * res) % mod;
 			TRACE2(cout << result << endl);
 		}
 		TRACE2(cout << "(" << res << " * " << res << ") % " << mod << " = ");
-		res = (res * res) % mod;
+		res *= res;
+		res %= mod;
 		TRACE2(cout << res << endl);
 		pow >>= 1;
 	}
@@ -115,7 +124,13 @@ bool is_prime(int p)
 }
 
 bool is_prime(bigint big, int rounds) { // big int is not prime with probability of 4**(-rounds)
-	bigint s(0), t(0);
+	if ((big[0] & 1) == 0) return false;
+	for (int i = 0; i < small_primes_count; i++) {
+		if (big % small_primes[i] == 0) 
+			return false;
+	}
+	bigint t(0);
+	unsigned long long s = 0;
 	bigint big_copy = big - 1;
 	RNG rng;
 	while ((big_copy[0] & 1) == 0)
@@ -124,13 +139,14 @@ bool is_prime(bigint big, int rounds) { // big int is not prime with probability
 		s++;
 	}
 	t = big_copy;
+	unsigned long long max_a = (1 << 31 - 1);
 	for (int i = 0; i < rounds; i++) {
-		bigint a = rng.get_big_random(2, big - 2);
+		bigint a = rng.get_big_random(2, max_a);
 		bigint x = fast_pow_mod(a, t, big);
 		if (x == 1 || x == (big - 1)) {
 			continue;
 		}
-		for (bigint j = 0; j < s - 1; j++) {
+		for (unsigned long long j = 0; j < s - 1; j++) {
 			x = fast_pow_mod(x, 2, big);
 			if (x == 1) return false;
 			else if (x == big - 1) {
@@ -160,10 +176,12 @@ bigint generate_big_prime(unsigned int bits)
 	bigint p(rng, bits);
 	while (!is_prime(p, 5))
 	{
-		p++;
+		/*p++;
 		if (p.log2() + 1 > bits) {
 			p >>= 1;
 		}
+		std::cout << p << std::endl;*/
+		p = bigint(rng, bits);
 		std::cout << p << std::endl;
 	}
 	return p;

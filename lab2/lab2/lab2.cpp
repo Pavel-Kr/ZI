@@ -4,7 +4,7 @@
 int main()
 {
     RNG rng;
-    bigint test = generate_big_prime(128);
+    bigint test = generate_big_prime(512);
     std::cout << test << " is prime? : " << is_prime(test, 5) << std::endl;
     //char buffer[] = "Hello, Bob!";
     /*Shamir alice("Alice");
