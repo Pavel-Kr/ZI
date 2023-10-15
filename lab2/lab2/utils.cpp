@@ -36,17 +36,17 @@ bigint fast_pow_mod(bigint num, bigint pow, bigint mod)
 	bigint res = num;
 	bigint result = 1;
 	for (unsigned long long i = 0; i <= steps; i++) {
-		TRACE2(cout << "Bit: " << (pow[0] & 1) << endl);
+		//TRACE2(cout << "Bit: " << (pow[0] & 1) << endl);
 		if (pow[0] & 1) {
-			TRACE2(cout << "Result: ");
-			TRACE2(cout << result << " * " << res << ") % " << mod << " = ");
+			//TRACE2(cout << "Result: ");
+			//TRACE2(cout << result << " * " << res << ") % " << mod << " = ");
 			result = (result * res) % mod;
-			TRACE2(cout << result << endl);
+			//TRACE2(cout << result << endl);
 		}
-		TRACE2(cout << "(" << res << " * " << res << ") % " << mod << " = ");
+		//TRACE2(cout << "(" << res << " * " << res << ") % " << mod << " = ");
 		res *= res;
 		res %= mod;
-		TRACE2(cout << res << endl);
+		//TRACE2(cout << res << endl);
 		pow >>= 1;
 	}
 	return result;
@@ -65,6 +65,10 @@ void swap(bigint* a, bigint* b) {
 }
 
 void print_vector(const char* name, Vector3 v) {
+	cout << name << " = { " << v.gcd << ", " << v.x << ", " << v.y << " }" << endl;
+}
+
+void print_vector(const char* name, Vector3Big v) {
 	cout << name << " = { " << v.gcd << ", " << v.x << ", " << v.y << " }" << endl;
 }
 
@@ -182,7 +186,7 @@ bigint generate_big_prime(unsigned int bits)
 		}
 		std::cout << p << std::endl;*/
 		p = bigint(rng, bits);
-		std::cout << p << std::endl;
+		//std::cout << p << std::endl;
 	}
 	return p;
 }

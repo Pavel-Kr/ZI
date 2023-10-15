@@ -9,7 +9,7 @@
 
 #include "bigint.h"
 
-#define TRACE_LEVEL 0
+#define TRACE_LEVEL 1
 
 #if TRACE_LEVEL == 1
 #define TRACE(CMD) (CMD)

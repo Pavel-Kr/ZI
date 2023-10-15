@@ -24,6 +24,56 @@ bigint::bigint(bool negative, const unsigned int* digits_arr, size_t count) : is
     }
 }
 
+bigint::bigint(const char* bytes, size_t size) : is_negative(false)
+{
+    size_t count = size / sizeof(int);
+    if (size % sizeof(int) != 0) count++;
+    unsigned int* arr = new unsigned int[count];
+    memset(arr, 0, count * sizeof(int));
+    memcpy(arr, bytes, size);
+    for (int i = count - 1; i >= 0; i--) {
+        digits.push_back(arr[i]);
+    }
+    delete[] arr;
+}
+
+int hex2int(char ch)
+{
+    if (ch >= '0' && ch <= '9')
+        return ch - '0';
+    if (ch >= 'A' && ch <= 'F')
+        return ch - 'A' + 10;
+    if (ch >= 'a' && ch <= 'f')
+        return ch - 'a' + 10;
+    return -1;
+}
+
+bigint::bigint(const char* hex_str, dummy dummy) : is_negative(false)
+{
+    size_t len = strlen(hex_str);
+    std::vector<unsigned int> nums;
+    int i = 0;
+    unsigned int num = 0;
+    while(i < len) {
+        if (!isxdigit(hex_str[i]))
+            throw "Not vaild hex string";
+        int n = hex2int(hex_str[i]);
+        num <<= 4;
+        num |= n;
+        if ((i + 1) % 8 == 0) {
+            nums.push_back(num);
+            num = 0;
+        }
+        i++;
+    }
+    if (num != 0) {
+        nums.push_back(num);
+    }
+    for (int i = nums.size() - 1; i >= 0; i--) {
+        digits.push_back(nums[i]);
+    }
+}
+
 bigint::bigint(long long num) : is_negative(false)
 {
     if (num < 0){
@@ -50,6 +100,7 @@ bigint::bigint(RNG &rng, unsigned int bits) : is_negative(false)
     }
     if(major_bits > 0)
         digits[whole_digits_count] = rng.get_random(0, (1 << major_bits) - 1);
+    set_bit(bits - 1, true);
 }
 
 bigint::bigint(const bigint& b) {
@@ -80,6 +131,20 @@ unsigned long long bigint::log2()
     return _bits_count() - 1;
 }
 
+unsigned long long bigint::digits_count()
+{
+    return digits.size();
+}
+
+char* bigint::as_bytes()
+{
+    unsigned int* data = new unsigned int[digits.size()];
+    for (int i = digits.size() - 1, j = 0; i >= 0; i--, j++) {
+        data[j] = digits[i];
+    }
+    return (char*)data;
+}
+
 void bigint::operator+=(bigint b){
     bigint tmp = *this + b;
     *this = tmp;
@@ -90,6 +155,11 @@ bigint bigint::operator+ (bigint b){
         bigint pos_b = b;
         pos_b.is_negative = false;
         return *this - pos_b;
+    }
+    if (is_negative) {
+        bigint pos = *this;
+        pos.is_negative = false;
+        return b - pos;
     }
     bigint c;
     int len = 0;
@@ -161,6 +231,11 @@ bigint bigint::operator- (bigint b){
         c = b - *this;
         c.is_negative = true;
         return c;
+    }
+    if (b.is_negative) {
+        bigint tmp = b;
+        tmp.is_negative = false;
+        return *this + tmp;
     }
     int len = b.digits.size();
     int carry = 0;
@@ -351,7 +426,7 @@ bool bigint::operator != (bigint b){
 bool bigint::operator!=(long num)
 {
     bigint rhs = bigint(num);
-    return *this == rhs;
+    return *this != rhs;
 }
 
 bool bigint::operator < (bigint b){

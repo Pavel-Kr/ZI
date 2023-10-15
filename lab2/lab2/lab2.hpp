@@ -39,6 +39,28 @@ public:
 	void decrypt_file(const char* file_in, const char* file_out);
 };
 
+class RSA_Big {
+	RNG rng;
+	std::string name;
+	bigint p, q, phi;
+	bigint secret_key;
+public:
+	bigint public_key;
+	bigint n;
+	RSA_Big(const char* name = "RSA");
+	void generate_keys();
+	void print_keys();
+	bool test_keys();
+	void save_keys_to_files(const char* _public, const char* _secret);
+	void load_keys_from_files(const char* _public, const char* _secret);
+	std::vector<bigint> encrypt_data(const char* data, bigint public_key, bigint n, size_t size);
+	char* decrypt_data(std::vector<bigint> encrypted, bigint secret_key, bigint n, size_t* size);
+	void send_encrypted(RSA_Big* receiver, const char* message, size_t size);
+	void receive_encrypted(std::vector<bigint> encrypted);
+	void encrypt_file(const char* file_in, const char* file_out);
+	void decrypt_file(const char* file_in, const char* file_out);
+};
+
 static class Vernam {
 public:
 	static char* encrypt_data(const char* data, const char* key, size_t size);
