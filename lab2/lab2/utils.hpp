@@ -30,11 +30,11 @@ struct diffie_hellman_data {
 };
 
 class Abonent {
+protected:
 	int secret_key;
 	RNG rng;
-	char* buffer;
-	size_t buf_index;
 public:
+	Abonent(){}
 	diffie_hellman_data df_data;
 	int public_key;
 	std::string name;
@@ -43,11 +43,6 @@ public:
 	void print_keys();
 	void init_connection(Abonent& b);
 	void generate_keys();
-	void send_el_gamal_encrypted(Abonent& receiver, const char* message, size_t size);
-	void create_buffer(size_t size);
-	void receive_encrypted_symbol(int r, int e);
-	void print_buffer();
-	~Abonent();
 };
 
 struct Vector3 {
@@ -68,5 +63,5 @@ int generate_prime(int min, int max);
 bigint generate_big_prime(unsigned int bits);
 bool is_prime(bigint big, int rounds);
 int discrete_log(int base, int val, int mod);
-char* load_from_file(const char* file_path, size_t* size);
-void save_to_file(const char* data, size_t size, const char* file_path);
+unsigned char* load_from_file(const char* file_path, size_t* size);
+void save_to_file(const unsigned char* data, size_t size, const char* file_path);

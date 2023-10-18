@@ -33,6 +33,9 @@
     <ClCompile Include="bigint.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="elgamal.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="lab2.hpp">
@@ -46,9 +49,11 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="output.txt">
+    <Image Include="Screen.png">
       <Filter>Файлы ресурсов</Filter>
-    </Text>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
     <Text Include="test.txt">
       <Filter>Файлы ресурсов</Filter>
     </Text>

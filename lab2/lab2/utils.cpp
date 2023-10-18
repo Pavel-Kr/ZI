@@ -238,7 +238,7 @@ int discrete_log(int base, int val, int mod)
 	return 0;
 }
 
-char* load_from_file(const char* file_path, size_t *size)
+unsigned char* load_from_file(const char* file_path, size_t *size)
 {
 	std::ifstream ifs(file_path, std::ifstream::binary);
 	if (ifs) {
@@ -250,10 +250,10 @@ char* load_from_file(const char* file_path, size_t *size)
 		pbuf->pubseekpos(0, ifs.in);
 
 		// allocate memory to contain file data
-		char* buffer = new char[*size];
+		unsigned char* buffer = new unsigned char[*size];
 
 		// get file data
-		pbuf->sgetn(buffer, *size);
+		pbuf->sgetn((char*)buffer, *size);
 
 		ifs.close();
 
@@ -262,17 +262,17 @@ char* load_from_file(const char* file_path, size_t *size)
 	return nullptr;
 }
 
-void save_to_file(const char* data, size_t size, const char* file_path)
+void save_to_file(const unsigned char* data, size_t size, const char* file_path)
 {
 	ofstream ofs(file_path, std::ofstream::binary);
 	if (ofs) {
 		std::streambuf* pbuf = ofs.rdbuf();
-		pbuf->sputn(data, size);
+		pbuf->sputn((char*)data, size);
 		ofs.close();
 	}
 }
 
-Abonent::Abonent(const char *name) : buffer(NULL)
+Abonent::Abonent(const char *name)
 {
 	this->name.assign(name);
 }
@@ -297,61 +297,4 @@ void Abonent::generate_keys()
 {
 	secret_key = rng.get_random(2, df_data.p - 2);
 	public_key = fast_pow_mod(df_data.g, secret_key, df_data.p);
-}
-
-void Abonent::send_el_gamal_encrypted(Abonent& receiver, const char* message, size_t size)
-{
-	std::cout << name << " Sent message = " << message << std::endl;
-	TRACE(std::cout << "Message bytes = ");
-	for (size_t i = 0; i < size; i++) {
-		TRACE(std::cout << std::dec << (int)message[i] << " ");
-	}
-	TRACE(std::cout << std::endl);
-	receiver.create_buffer(size);
-	for (size_t i = 0; i < size; i++) {
-		int k;
-		do {
-			k = rng.get_random(2, df_data.p - 2);
-		} while (extended_Euclidean(k, df_data.p - 1).gcd != 1);
-		TRACE(std::cout << "K = " << k << std::endl);
-		int r = fast_pow_mod(df_data.g, k, df_data.p);
-		uint64_t powmod = fast_pow_mod(receiver.public_key, k, df_data.p);
-		uint64_t tmp = powmod * message[i];
-		std::cout << "tmp = " << tmp << std::endl;
-		unsigned int e = tmp % df_data.p;
-		TRACE(std::cout  << std::dec << "(" << r << "," << e << ") ");
-		receiver.receive_encrypted_symbol(r, e);
-	}
-	TRACE(std::cout << std::endl);
-	receiver.print_buffer();
-}
-
-void Abonent::create_buffer(size_t size)
-{
-	if(!buffer)
-		buffer = new char[size];
-	else {
-		delete[] buffer;
-		buffer = new char[size];
-	}
-	buf_index = 0;
-}
-
-void Abonent::receive_encrypted_symbol(int r, int e) {
-	uint64_t powmod = fast_pow_mod(r, (df_data.p - 1 - secret_key), df_data.p);
-	uint64_t tmp = e * powmod;
-	std::cout << "tmp = " << tmp << std::endl;
-	unsigned int m = tmp % df_data.p;
-	TRACE(std::cout << "Received m = " << m << std::endl);
-	buffer[buf_index++] = (char)m;
-}
-
-void Abonent::print_buffer()
-{
-	std::cout << name << " received message: " << buffer << std::endl;
-}
-
-Abonent::~Abonent()
-{
-	if (buffer) delete[] buffer;
 }

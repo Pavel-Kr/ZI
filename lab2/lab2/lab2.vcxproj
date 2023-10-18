@@ -130,6 +130,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="bigint.cpp" />
+    <ClCompile Include="elgamal.cpp" />
     <ClCompile Include="lab2.cpp" />
     <ClCompile Include="rsa.cpp" />
     <ClCompile Include="shamir.cpp" />
@@ -142,7 +143,9 @@
     <ClInclude Include="utils.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="output.txt" />
+    <Image Include="Screen.png" />
+  </ItemGroup>
+  <ItemGroup>
     <Text Include="test.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -37,7 +37,7 @@ private:
 public:
     bigint();
     bigint(bool negative, const unsigned int* digits_arr, size_t count);
-    bigint(const char* bytes, size_t size);
+    bigint(const unsigned char* bytes, size_t size);
     bigint(const char* hex_str, dummy dummy); // dummy is not used and only here because of c++
     bigint(long long num);
     bigint(RNG &rng, unsigned int bits);
@@ -48,7 +48,7 @@ public:
     bool is_prime();
     unsigned long long log2();
     unsigned long long digits_count();
-    char* as_bytes();
+    unsigned char* as_bytes(size_t *size);
 
     void operator+=(bigint b);
     void operator-= (bigint b);

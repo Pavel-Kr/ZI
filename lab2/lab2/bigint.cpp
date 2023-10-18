@@ -24,7 +24,7 @@ bigint::bigint(bool negative, const unsigned int* digits_arr, size_t count) : is
     }
 }
 
-bigint::bigint(const char* bytes, size_t size) : is_negative(false)
+bigint::bigint(const unsigned char* bytes, size_t size) : is_negative(false)
 {
     size_t count = size / sizeof(int);
     if (size % sizeof(int) != 0) count++;
@@ -136,13 +136,62 @@ unsigned long long bigint::digits_count()
     return digits.size();
 }
 
-char* bigint::as_bytes()
+unsigned char* bigint::as_bytes(size_t* size)
 {
-    unsigned int* data = new unsigned int[digits.size()];
+    /*unsigned int* data = new unsigned int[digits.size()];
     for (int i = digits.size() - 1, j = 0; i >= 0; i--, j++) {
         data[j] = digits[i];
     }
-    return (char*)data;
+    *size = digits.size() * sizeof(int);
+    return (unsigned char*)data;*/
+    unsigned char* data = new unsigned char[digits.size() * sizeof(int)];
+    memset(data, 0, digits.size() * sizeof(int));
+    int j = 0;
+    int start = 0;
+    for (int i = digits.size() - 1; i >= 0; i--) {
+        unsigned char i0, i1, i2, i3;
+        i3 = (digits[i] >> 24) & 0xff;
+        i2 = (digits[i] >> 16) & 0xff;
+        i1 = (digits[i] >> 8) & 0xff;
+        i0  = digits[i] & 0xff;
+        /*if (i == digits.size() - 1) {
+            if (i3 == 0) {
+                start++;
+                if (i2 == 0) {
+                    start++;
+                    if (i1 == 0) {
+                        start++;
+                    }
+                }
+            }
+            j += start;
+            data[j++] = i0;
+            if (j < 4) {
+                data[j++] = i1;
+            }
+            if (j < 4) {
+                data[j++] = i2;
+            }
+            if (j < 4) {
+                data[j++] = i3;
+            }
+        }
+        else {*/
+            data[j++] = i0;
+            data[j++] = i1;
+            data[j++] = i2;
+            data[j++] = i3;
+        //}
+    }
+    /*while (data[0] == 0)
+    {
+        data++;
+        j--;
+    }*/
+    data += start;
+    j -= start;
+    *size = j;
+    return data;
 }
 
 void bigint::operator+=(bigint b){
